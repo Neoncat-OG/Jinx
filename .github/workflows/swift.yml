@@ -38,7 +38,8 @@ jobs:
     - name: Prepare framework for Theos
       run: |
         mkdir -p built-framework/Jinx
-        cp -r .build/release/ built-framework/Jinx/
+        cp .build/release/libJinx.a built-framework/Jinx/
+        cp -r .build/release/Modules/Jinx.swiftmodule built-framework/Jinx/
 
     - name: Upload Jinx static library
       uses: actions/upload-artifact@v4
