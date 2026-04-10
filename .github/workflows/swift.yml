@@ -19,8 +19,18 @@ jobs:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: '16.0'
+    - name: Download ios18 patched SDk
+      run: |
+        curl -L -o iPhoneOS18.0.sdk.zip https://github.com/xybp888/iOS-SDKs/releases/download/iOS18.0-SDKs/iPhoneOS18.0.sdk.zip
+        unzip iPhoneOS18.0.sdk.zip
     - name: Build
       run: |
+        rm -rf .build
+
+        SDK_PATH="$(pwd)/iPhoneOS18.0.sdk"   # adjust if the folder name is different
+
         swift build -c release \
-          --triple arm64-apple-ios \
-          -Xswiftc -target -Xswiftc arm64-apple-ios14.0
+            --triple arm64-apple-ios14.0 \
+            -Xswiftc -sdk -Xswiftc "$SDK_PATH" \
+            -Xswiftc -target -Xswiftc arm64-apple-ios14.0 \
+            -Xswiftc -Osize
