@@ -35,11 +35,31 @@ jobs:
             -Xswiftc -target -Xswiftc arm64-apple-ios14.0 \
             -Xswiftc -Osize
 
+        mkdir -p tmp/arm64
+        cp .build/release/libJinx.a tmp/arm64/
+        cp -r .build/release/Modules/Jinx.swiftmodule tmp/arm64/
+
+
+        swift build -c release \
+            --triple arm64e-apple-ios14.0 \
+            -Xswiftc -sdk -Xswiftc "$SDK_PATH" \
+            -Xswiftc -target -Xswiftc arm64e-apple-ios14.0 \
+            -Xswiftc -Osize
+
+        mkdir -p tmp/arm64e
+        cp .build/release/libJinx.a tmp/arm64e/
+        cp -r .build/release/Modules/Jinx.swiftmodule tmp/arm64e/
+
     - name: Prepare framework for Theos
       run: |
         mkdir -p built-framework/Jinx
-        cp .build/release/libJinx.a built-framework/Jinx/
-        cp -r .build/release/Modules/Jinx.swiftmodule built-framework/Jinx/
+        
+        lipo -create -output libJinx.a tmp/arm64/libJinx.a tmp/arm64e/libJinx.a
+        cp libJinx.a built-framework/Jinx/
+        
+        mkdir built-framework/Jinx/Jinx.swiftmodule
+        cp tmp/arm64/Jinx.swiftmodule built-framework/Jinx/Jinx.swiftmodule/arm64-apple-ios.swiftmodule
+        cp tmp/arm64e/Jinx.swiftmodule built-framework/Jinx/Jinx.swiftmodule/arm64e-apple-ios.swiftmodule
 
     - name: Upload Jinx static library
       uses: actions/upload-artifact@v4
